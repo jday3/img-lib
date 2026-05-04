@@ -1,11 +1,219 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Image library</title>
-  </head>
-  <body>
-    <!-- Add your gallery / markup here -->
-  </body>
+
+<head>
+  <meta charset="utf-8" />
+  <title>Project Image Library</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 0;
+      padding: 24px;
+      background: #fafafa;
+      color: #222;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: #fafafa;
+      padding-bottom: 16px;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: 24px;
+    }
+
+    input {
+      width: 100%;
+      max-width: 480px;
+      padding: 10px 12px;
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .image-wrap {
+      aspect-ratio: 4 / 3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f1f1f1;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .name {
+      font-weight: 600;
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .url {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+      color: #555;
+      word-break: break-all;
+      margin-bottom: 8px;
+    }
+
+    button {
+      font-size: 12px;
+      padding: 6px 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Project Image Library</h1>
+    <input id="search" placeholder="Filter by filename or URL..." />
+  </header>
+
+  <main class="grid" id="grid"></main>
+
+  <script>
+    const CDN_BASE = "https://asset.mavenclinic.com/img/";
+    const filenames = [
+      "glp1-testimonial-condition-01.webp",
+      "glp1-testimonial-condition-02.webp",
+      "glp1-testimonial-condition-03.webp",
+      "glp1-testimonial-hormonal-01.webp",
+      "glp1-testimonial-hormonal-02.webp",
+      "glp1-testimonial-hormonal-03.webp",
+      "glp1-testimonial-micro-01.webp",
+      "glp1-testimonial-micro-02.webp",
+      "glp1-testimonial-micro-03.webp",
+      "glp1-testimonial-micro-04.webp",
+      "glp1-testimonial-micro-05.webp",
+      "glp1-testimonial-micro-06.webp",
+      "glp1-testimonial-postpartum-01.webp",
+      "glp1-testimonial-postpartum-02.webp",
+      "glp1-testimonial-postpartum-03.webp",
+      "hormone-h-copper-iud.webp",
+      "hormone-h-estrogen-progesterone.webp",
+      "hormone-h-hormone-therapy.webp",
+      "hormone-h-oral-contraceptives.webp",
+      "hormone-h-testosterone.webp",
+      "hormone-h-vaginal-estrogen.webp",
+      "hormone-h-vaginal-ring.webp",
+      "hormone-nh-iron-supplements-1.webp",
+      "hormone-nh-iron-supplements.webp",
+      "hormone-nh-low-dose-ssris.webp",
+      "hormone-nh-sleep-routine.webp",
+      "hormone-nh-specialized-nutrition-1.webp",
+      "hormone-nh-specialized-nutrition.webp",
+      "hormone-nh-targeted-exercise-plan.webp",
+      "hormone-nh-vitamind.webp",
+      "hormone-stats-01.webp",
+      "hormone-stats-02.webp",
+      "hormone-stats-03.webp",
+      "hormone-stats-04.webp",
+      "hormone-stats-05.webp",
+      "interstitial-every-body-is-unique.png",
+      "interstitial-personalized-report.png",
+      "interstitial-why-mavern-feels-different.png",
+      "medication-foundayo-pill.webp",
+      "medication-ozempic.webp",
+      "medication-wegovy-pen.webp",
+      "medication-wegovy-pill.webp",
+      "medication-wegovy-pills.webp",
+      "medication-zepbound-kwikpen.webp",
+      "medication-zepbound-pen.webp",
+      "medication-zepbound-vial.webp",
+      "testimonial-hc-peri-01.webp",
+      "testimonial-hc-peri-02.webp",
+      "testimonial-hc-peri-03.webp",
+      "testimonial-hc-post-01.webp",
+      "testimonial-hc-post-02.webp",
+      "testimonial-hc-post-03.webp",
+      "testimonial-hc-pre-01.webp",
+      "testimonial-hc-pre-02.webp",
+      "testimonial-hc-pre-03.webp",
+      "testimonial-hc-repro-01.webp",
+      "testimonial-hc-repro-02.webp",
+      "testimonial-hc-repro-03.webp",
+    ];
+    const images = filenames.map((name) => ({
+      name,
+      url: CDN_BASE + name,
+    }));
+
+    const grid = document.getElementById("grid");
+    const search = document.getElementById("search");
+
+    function render(filter = "") {
+      const normalizedFilter = filter.toLowerCase();
+
+      grid.innerHTML = images
+        .filter((image) => {
+          return (
+            image.name.toLowerCase().includes(normalizedFilter) ||
+            image.url.toLowerCase().includes(normalizedFilter)
+          );
+        })
+        .map((image) => {
+          return `
+              <article class="card">
+                <div class="image-wrap">
+                  <img src="${image.url}" alt="${image.name}" loading="lazy" />
+                </div>
+
+                <div class="name">${image.name}</div>
+                <div class="url">${image.url}</div>
+
+                <button type="button" data-url="${image.url}">
+                  Copy URL
+                </button>
+              </article>
+            `;
+        })
+        .join("");
+    }
+
+    grid.addEventListener("click", async (event) => {
+      const button = event.target.closest("button[data-url]");
+      if (!button) return;
+
+      await navigator.clipboard.writeText(button.dataset.url);
+
+      const originalText = button.textContent;
+      button.textContent = "Copied";
+      setTimeout(() => {
+        button.textContent = originalText;
+      }, 1000);
+    });
+
+    search.addEventListener("input", (event) => {
+      render(event.target.value);
+    });
+
+    render();
+  </script>
+</body>
+
 </html>
